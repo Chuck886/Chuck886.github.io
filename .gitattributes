@@ -1,0 +1,3 @@
+img/thumbs/*.jpg !text !filter !merge !diff
+img/thumbs/*.png !text !filter !merge !diff
+Video/封面动态高码流.mp4 !text !filter !merge !diff

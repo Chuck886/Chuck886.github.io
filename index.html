@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德意 — Film Editor</title>
+    <style>
+        :root {
+            --bg: #141416;
+            --bg-elevated: #1c1c1e;
+            --bg-card: #242426;
+            --bg-card-hover: #2a2a2d;
+            --text: #e8e8e8;
+            --text-dim: #a0a0a0;
+            --text-muted: #666;
+            --border: #2c2c2e;
+            --border-light: #38383a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 400;
+        }
+
+        /* ===== NAV ===== */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            transition: background 0.3s, border-color 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .nav.scrolled {
+            background: rgba(20, 20, 22, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom-color: rgba(255,255,255,0.06);
+        }
+
+        .nav-logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--text);
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-items a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            transition: color 0.2s;
+        }
+
+        .nav-items a:hover { color: var(--text); }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            filter: grayscale(30%) brightness(0.55);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(20,20,22,0.2) 0%, rgba(20,20,22,0.75) 60%, var(--bg) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 680px;
+            padding: 0 24px;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(44px, 7vw, 76px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: #fff;
+            margin-bottom: 24px;
+            line-height: 1.08;
+        }
+
+        .hero-content .tagline {
+            font-size: 17px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            line-height: 1.85;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.4;
+        }
+
+        .hero-scroll span {
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .hero-scroll .line {
+            width: 1px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            animation: scroll-line 2s ease-in-out infinite;
+        }
+
+        @keyframes scroll-line {
+            0%, 100% { transform: scaleY(1); transform-origin: top; }
+            50% { transform: scaleY(0.4); transform-origin: top; }
+        }
+
+        /* ===== SECTION ===== */
+        .section {
+            padding: 120px 0;
+        }
+
+        .section-alt {
+            background: var(--bg-elevated);
+        }
+
+        .section-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .sec-header {
+            text-align: center;
+            margin-bottom: 72px;
+        }
+
+        .sec-header .num {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .sec-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            color: var(--text);
+        }
+
+        /* ===== ABOUT ===== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .about-text .intro {
+            font-size: 18px;
+            line-height: 1.9;
+            color: var(--text-dim);
+            margin-bottom: 48px;
+        }
+
+        .about-stats {
+            display: flex;
+            gap: 64px;
+        }
+
+        .about-stat .val {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .about-stat .lbl {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 6px;
+            filter: grayscale(15%);
+        }
+
+        /* ===== SKILLS ===== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 40px 32px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .skill-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+        }
+
+        .skill-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            margin-bottom: 22px;
+            color: var(--text);
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tags span {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            letter-spacing: 0.03em;
+            transition: all 0.2s;
+        }
+
+        .skill-tags span:hover {
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text);
+        }
+
+        .skill-tags .primary {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.12);
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ===== WORKS ===== */
+        .works-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 52px;
+        }
+
+        .works-tab {
+            padding: 10px 28px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
+
+        .works-tab:hover {
+            color: var(--text);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .works-tab.active {
+            color: var(--text);
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .works-panel { display: none; }
+        .works-panel.active { display: contents; }
+
+        .work-item {
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .work-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-light);
+        }
+
+        .work-item-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: var(--bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .work-item-info {
+            padding: 18px 20px;
+        }
+
+        .work-item-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .work-item-info .meta {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .works-placeholder {
+            grid-column: 1 / -1;
+            padding: 80px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===== VIDEO CARD ===== */
+        .work-item-video .work-item-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            overflow: hidden;
+        }
+
+        .work-item-video .work-item-thumb::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .work-item-video .work-item-thumb::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.25);
+            z-index: 2;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .work-item-video .work-item-thumb .play-icon {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateX(2px);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 16px;
+            border-color: transparent transparent transparent rgba(255,255,255,0.8);
+            z-index: 3;
+            pointer-events: none;
+            transition: border-color 0.3s;
+        }
+
+        .work-item-video:hover .work-item-thumb .play-icon {
+            border-color: transparent transparent transparent rgba(255,255,255,1);
+        }
+
+        .work-item-video:hover .work-item-thumb::after {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.45);
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        .work-item-video .work-item-thumb .video-title {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            z-index: 3;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        .work-item-video .work-item-info {
+            display: none;
+        }
+
+        /* ===== VIDEO MODAL ===== */
+        .video-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .video-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .video-modal .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            cursor: pointer;
+            color: #fff;
+            font-size: 22px;
+            line-height: 44px;
+            text-align: center;
+            transition: background 0.2s;
+            z-index: 1;
+        }
+        .video-modal .modal-close:hover {
+            background: rgba(255,255,255,0.18);
+        }
+        .video-modal video {
+            max-width: 70vw;
+            max-height: 70vh;
+            border-radius: 6px;
+            outline: none;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* ===== CONTACT ===== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 32px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .contact-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+        }
+
+        .contact-card .label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .contact-card .value {
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .contact-card a {
+            color: var(--text);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .contact-card a:hover { opacity: 0.65; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 36px 40px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== REVEAL ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .nav-items { gap: 20px; }
+            .about-grid { grid-template-columns: 1fr; gap: 48px; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .works-grid { grid-template-columns: 1fr 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .section-inner { padding: 0 20px; }
+            .section { padding: 80px 0; }
+            .about-stats { gap: 44px; }
+            .sec-header { margin-bottom: 48px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 { font-size: 36px; }
+            .hero-content .tagline { font-size: 15px; }
+            .nav-items { gap: 14px; }
+            .nav-items a { font-size: 12px; }
+            .works-grid { grid-template-columns: 1fr; }
+            .about-stats { gap: 28px; }
+            .about-stat .val { font-size: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav" id="nav">
+        <div class="nav-logo">DEYI</div>
+        <ul class="nav-items">
+            <li><a href="#about">关于</a></li>
+            <li><a href="#skills">技能</a></li>
+            <li><a href="#works">作品</a></li>
+            <li><a href="#contact">联系</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg">
+            <img src="photo.jpg" alt="">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content reveal">
+            <h1>德意</h1>
+            <p class="tagline">资深剪辑师，深耕行业 11 年。<br>专注广告、TVC、纪录片、宣传片等各类视频剪辑，兼具包装、合成、动画与调色能力。</p>
+        </div>
+        <div class="hero-scroll">
+            <span>SCROLL</span>
+            <div class="line"></div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section section-alt" id="about">
+        <div class="section-inner">
+            <div class="about-grid">
+                <div class="about-text reveal">
+                    <p class="intro">后期总监 / 剪辑指导 / 剪辑师。11 年来深度参与广告、TVC、纪录片、宣传片等多种类型的影片制作，在剪辑之外也涉足包装、合成、动画与调色，追求每一帧的精准表达。</p>
+                    <div class="about-stats">
+                        <div class="about-stat">
+                            <div class="val">11+</div>
+                            <div class="lbl">年经验</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="val">200+</div>
+                            <div class="lbl">完成项目</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image reveal">
+                    <img src="photo.jpg" alt="德意">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section" id="skills">
+        <div class="section-inner">
+            <div class="sec-header reveal">
+                <span class="num">01</span>
+                <h2>技能与工具</h2>
+            </div>
+            <div class="skills-grid reveal">
+                <div class="skill-card">
+                    <h3>核心软件</h3>
+                    <div class="skill-tags">
+                        <span class="primary">DaVinci Resolve</span>
+                        <span class="primary">Premiere Pro</span>
+                        <span class="primary">After Effects</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <h3>专业领域</h3>
+                    <div class="skill-tags">
+                        <span>广告</span>
+                        <span>TVC</span>
+                        <span>纪录片</span>
+                        <span>宣传片</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <h3>拓展能力</h3>
+                    <div class="skill-tags">
+                        <span>包装</span>
+                        <span>合成</span>
+                        <span>动画</span>
+                        <span>调色</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WORKS -->
+    <section class="section section-alt" id="works">
+        <div class="section-inner">
+            <div class="sec-header reveal">
+                <span class="num">02</span>
+                <h2>代表作品</h2>
+            </div>
+            <div class="works-tabs reveal">
+                <button class="works-tab active" data-tab="tvc">TVC</button>
+                <button class="works-tab" data-tab="documentary">纪录片</button>
+                <button class="works-tab" data-tab="promo">宣传片</button>
+                <button class="works-tab" data-tab="shortfilm">短片</button>
+            </div>
+            <div class="works-grid reveal">
+                <!-- TVC Panel -->
+                <div class="works-panel active" id="panel-tvc">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/TVC/兴耀房产《一棵树的答案》.mp4">
+                            <span class="play-icon"></span><span class="video-title">兴耀房产《一棵树的答案》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/TVC/哥帝威《man&chans》.mp4">
+                            <span class="play-icon"></span><span class="video-title">哥帝威《man&chans》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/TVC/国家电网《煽风点火》.mp4">
+                            <span class="play-icon"></span><span class="video-title">国家电网《煽风点火》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/TVC/小胖威力《星空漫游者》.mp4">
+                            <span class="play-icon"></span><span class="video-title">小胖威力《星空漫游者》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/TVC/居家家居《消失的一小时》.mp4">
+                            <span class="play-icon"></span><span class="video-title">居家家居《消失的一小时》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/TVC/陈一丹基金会《旮旯GALA》.mp4">
+                            <span class="play-icon"></span><span class="video-title">陈一丹基金会《旮旯GALA》</span>
+                        </div>
+                    </div></div>
+
+                <!-- Documentary Panel -->
+                <div class="works-panel" id="panel-documentary">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/纪录片/上海散爆十周年纪录片.mp4">
+                            <span class="play-icon"></span><span class="video-title">上海散爆十周年纪录片</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/纪录片/小胖威利《星星落在我家里》.mp4">
+                            <span class="play-icon"></span><span class="video-title">小胖威利《星星落在我家里》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/纪录片/春苗基金会《守护早产微宝贝》.mp4">
+                            <span class="play-icon"></span><span class="video-title">春苗基金会《守护早产微宝贝》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/纪录片/武林青年说.mp4">
+                            <span class="play-icon"></span><span class="video-title">武林青年说</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/纪录片/追觅《让小小的我们被看见》.mp4">
+                            <span class="play-icon"></span><span class="video-title">追觅《让小小的我们被看见》</span>
+                        </div>
+                    </div></div>
+
+                <!-- Promo Panel -->
+                <div class="works-panel" id="panel-promo">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/万利《极致即底气》.mp4">
+                            <span class="play-icon"></span><span class="video-title">万利《极致即底气》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/十八棵御茶园《一茶现万千》.mp4">
+                            <span class="play-icon"></span><span class="video-title">十八棵御茶园《一茶现万千》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/山西青基会《三晋文明守望》.mp4">
+                            <span class="play-icon"></span><span class="video-title">山西青基会《三晋文明守望》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/杭州直播经济.mp4">
+                            <span class="play-icon"></span><span class="video-title">杭州直播经济</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/爱德基金会《星辰》字幕说明版.mp4">
+                            <span class="play-icon"></span><span class="video-title">爱德基金会《星辰》字幕说明版</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/蓝城设计院《深蓝下的匠》.mp4">
+                            <span class="play-icon"></span><span class="video-title">蓝城设计院《深蓝下的匠》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/宣传片/黄河公益基金会《未完成的诗篇》.mp4">
+                            <span class="play-icon"></span><span class="video-title">黄河公益基金会《未完成的诗篇》</span>
+                        </div>
+                    </div></div>
+
+                <!-- Shortfilm Panel -->
+                <div class="works-panel" id="panel-shortfilm">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/LAO center 《万象人生》.mp4">
+                            <span class="play-icon"></span><span class="video-title">LAO center《万象人生》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/Neverfar.mp4">
+                            <span class="play-icon"></span><span class="video-title">Neverfar</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/中免集团《遇见美好》.mp4">
+                            <span class="play-icon"></span><span class="video-title">中免集团《遇见美好》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/九阳公益厨房《少年生长》.mp4">
+                            <span class="play-icon"></span><span class="video-title">九阳公益厨房《少年生长》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/小胖威利《天使就在我家里》.mp4">
+                            <span class="play-icon"></span><span class="video-title">小胖威利《天使就在我家里》</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/尾巴生活_混合猫砂.mp4">
+                            <span class="play-icon"></span><span class="video-title">尾巴生活 · 混合猫砂</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/湃墅 品牌宣传片.mp4">
+                            <span class="play-icon"></span><span class="video-title">湃墅 品牌宣传片</span>
+                        </div>
+                    </div><div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="file:///C:/Users/Administrator/Desktop/压缩/短片/网易《决战紫禁之巅》.mp4">
+                            <span class="play-icon"></span><span class="video-title">网易《决战紫禁之巅》</span>
+                        </div>
+                    </div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact">
+        <div class="section-inner">
+            <div class="sec-header reveal">
+                <span class="num">03</span>
+                <h2>联系方式</h2>
+            </div>
+            <div class="contact-grid reveal">
+                <div class="contact-card">
+                    <span class="label">手机</span>
+                    <span class="value">15715794021</span>
+                </div>
+                <div class="contact-card">
+                    <span class="label">邮箱</span>
+                    <span class="value"><a href="mailto:mdjsszxgnib@163.com">mdjsszxgnib@163.com</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        &copy; 2026 德意 &nbsp;·&nbsp; Film Editor &amp; Post-Production Director
+    </footer>
+
+    <!-- VIDEO MODAL -->
+    <div class="video-modal" id="videoModal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <video id="modalVideo" controls></video>
+    </div>
+
+    <script>
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        document.querySelectorAll('.works-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.works-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.works-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 视频卡片点击：弹出遮罩层播放
+        const videoModal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalClose = document.getElementById('modalClose');
+
+        document.querySelectorAll('.work-item-video .work-item-thumb').forEach(thumb => {
+            thumb.style.cursor = 'pointer';
+            thumb.addEventListener('click', () => {
+                const src = thumb.getAttribute('data-src');
+                if (src) {
+                    modalVideo.src = src;
+                    videoModal.classList.add('active');
+                    modalVideo.play();
+                }
+            });
+        });
+
+        function closeModal() {
+            modalVideo.pause();
+            modalVideo.src = '';
+            videoModal.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

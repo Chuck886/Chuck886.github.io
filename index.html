@@ -166,7 +166,7 @@
         }
 
         .section-inner {
-            max-width: 1080px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 40px;
         }
@@ -177,11 +177,7 @@
         }
 
         .sec-header .num {
-            font-size: 11px;
-            letter-spacing: 0.16em;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            display: block;
+            display: none;
         }
 
         .sec-header h2 {
@@ -323,7 +319,7 @@
 
         .works-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
         }
 
@@ -401,45 +397,42 @@
         }
 
         .work-item-video .work-item-thumb::after {
-            content: '';
+            /* 保留空规则，仅用于可能的未来扩展 */
+        }
+
+        .work-item-video .work-item-thumb .play-icon {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 56px;
-            height: 56px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
-            border: 2px solid rgba(255,255,255,0.25);
-            z-index: 2;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            z-index: 3;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s;
         }
 
-        .work-item-video .work-item-thumb .play-icon {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateX(2px);
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 10px 0 10px 16px;
-            border-color: transparent transparent transparent rgba(255,255,255,0.8);
-            z-index: 3;
-            pointer-events: none;
-            transition: border-color 0.3s;
+        .work-item-video .work-item-thumb .play-icon::before {
+            content: '\25B6';
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+            margin-left: 2px;
+            transition: color 0.3s;
         }
 
         .work-item-video:hover .work-item-thumb .play-icon {
-            border-color: transparent transparent transparent rgba(255,255,255,1);
+            background: rgba(0,0,0,0.65);
+            transform: translate(-50%, -50%) scale(1.08);
         }
 
-        .work-item-video:hover .work-item-thumb::after {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.45);
-            transform: translate(-50%, -50%) scale(1.08);
+        .work-item-video:hover .work-item-thumb .play-icon::before {
+            color: rgba(255,255,255,1);
         }
 
         .work-item-video .work-item-thumb .video-title {
@@ -504,6 +497,58 @@
             outline: none;
             background: #000;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* 隐藏浏览器原生覆盖播放按钮 */
+        .video-modal video::-webkit-media-controls-overlay-play-button {
+            display: none;
+        }
+
+        /* 自定义播放按钮覆盖层 */
+        .video-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .video-play-overlay.visible {
+            opacity: 1;
+        }
+        .video-play-overlay .custom-play-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: background 0.2s;
+        }
+        .video-play-overlay .custom-play-btn:hover {
+            background: rgba(0, 0, 0, 0.65);
+        }
+        .video-play-overlay .custom-play-btn::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px 0 6px 11px;
+            border-color: transparent transparent transparent rgba(255, 255, 255, 0.85);
+            margin-left: 2px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* ===== CONTACT ===== */
@@ -695,133 +740,237 @@
             </div>
             <div class="works-tabs reveal">
                 <button class="works-tab active" data-tab="tvc">TVC</button>
-                <button class="works-tab" data-tab="documentary">纪录片</button>
                 <button class="works-tab" data-tab="promo">宣传片</button>
+                <button class="works-tab" data-tab="documentary">纪录片</button>
+                <button class="works-tab" data-tab="drama">剧情片</button>
                 <button class="works-tab" data-tab="shortfilm">短片</button>
+                <button class="works-tab" data-tab="mv">MV</button>
+                <button class="works-tab" data-tab="product">产品</button>
             </div>
             <div class="works-grid reveal">
                 <!-- TVC Panel -->
                 <div class="works-panel active" id="panel-tvc">
                     <div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/TVC/兴耀房产《一棵树的答案》.mp4" style="background-image: url('img/thumbs/兴耀房产《一棵树的答案》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">兴耀房产《一棵树的答案》</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/TVC/哥帝威《man&chans》.mp4" style="background-image: url('img/thumbs/哥帝威《man&chans》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">哥帝威《man&chans》</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/TVC/国家电网《煽风点火》.mp4" style="background-image: url('img/thumbs/国家电网《煽风点火》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">国家电网《煽风点火》</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/TVC/小胖威力《星空漫游者》.mp4" style="background-image: url('img/thumbs/小胖威力《星空漫游者》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">小胖威力《星空漫游者》</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/TVC/居家家居《消失的一小时》.mp4" style="background-image: url('img/thumbs/居家家居《消失的一小时》.jpg'); background-size: cover; background-position: center;">
+                        <div class="work-item-thumb" data-src="Video/TVC/居家家居《消失的一小时》.mp4" style="background-image: url('img/thumbs/居家家居《消失的一小时》.jpg'); background-size: cover; background-position: center;">
                             <span class="play-icon"></span><span class="video-title">居家家居《消失的一小时》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/TVC/陈一丹基金会《旮旯GALA》.mp4" style="background-image: url('img/thumbs/陈一丹基金会《旮旯GALA》.jpg'); background-size: cover; background-position: center;">
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/TVC/国家电网《煽风点火》.mp4" style="background-image: url('img/thumbs/国家电网《煽风点火》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">国家电网《煽风点火》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/TVC/陈一丹基金会《旮旯GALA》.mp4" style="background-image: url('img/thumbs/陈一丹基金会《旮旯GALA》.jpg'); background-size: cover; background-position: center;">
                             <span class="play-icon"></span><span class="video-title">陈一丹基金会《旮旯GALA》</span>
                         </div>
-                    </div></div>
-
-                <!-- Documentary Panel -->
-                <div class="works-panel" id="panel-documentary">
+                    </div>
                     <div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/纪录片/上海散爆十周年纪录片.mp4" style="background-image: url('img/thumbs/上海散爆十周年纪录片.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">上海散爆十周年纪录片</span>
+                        <div class="work-item-thumb" data-src="Video/TVC/兴耀房产《一棵树的答案》.mp4" style="background-image: url('img/thumbs/兴耀房产《一棵树的答案》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">兴耀房产《一棵树的答案》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/纪录片/小胖威利《星星落在我家里》.mp4" style="background-image: url('img/thumbs/小胖威利《星星落在我家里》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">小胖威利《星星落在我家里》</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/TVC/小胖威力《星空漫游者》.mp4" style="background-image: url('img/thumbs/小胖威力《星空漫游者》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">小胖威力《星空漫游者》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/纪录片/春苗基金会《守护早产微宝贝》.mp4" style="background-image: url('img/thumbs/春苗基金会《守护早产微宝贝》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">春苗基金会《守护早产微宝贝》</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/TVC/哥帝威《man&chans》.mp4" style="background-image: url('img/thumbs/哥帝威《man&chans》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">哥帝威《man&chans》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/纪录片/武林青年说.mp4" style="background-image: url('img/thumbs/武林青年说.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">武林青年说</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/TVC/来伊份《嗨吃无骨》.mp4" style="background-image: url('img/thumbs/来伊份《嗨吃无骨》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">来伊份《嗨吃无骨》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/纪录片/追觅《让小小的我们被看见》.mp4" style="background-image: url('img/thumbs/追觅《让小小的我们被看见》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">追觅《让小小的我们被看见》</span>
-                        </div>
-                    </div></div>
+                    </div>
+                </div>
 
-                <!-- Promo Panel -->
+                <!-- 宣传片 Panel -->
                 <div class="works-panel" id="panel-promo">
                     <div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/万利《极致即底气》.mp4" style="background-image: url('img/thumbs/万利《极致即底气》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">万利《极致即底气》</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/十八棵御茶园《一茶现万千》.mp4" style="background-image: url('img/thumbs/十八棵御茶园《一茶现万千》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">十八棵御茶园《一茶现万千》</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/山西青基会《三晋文明守望》.mp4" style="background-image: url('img/thumbs/山西青基会《三晋文明守望》.jpg'); background-size: cover; background-position: center;">
+                        <div class="work-item-thumb" data-src="Video/宣传片/山西青基会《三晋文明守望》.mp4" style="background-image: url('img/thumbs/山西青基会《三晋文明守望》.jpg'); background-size: cover; background-position: center;">
                             <span class="play-icon"></span><span class="video-title">山西青基会《三晋文明守望》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/杭州直播经济.mp4" style="background-image: url('img/thumbs/杭州直播经济.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">杭州直播经济</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/爱德基金会《星辰》字幕说明版.mp4" style="background-image: url('img/thumbs/爱德基金会《星辰》字幕说明版.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">爱德基金会《星辰》字幕说明版</span>
-                        </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/蓝城设计院《深蓝下的匠》.mp4" style="background-image: url('img/thumbs/蓝城设计院《深蓝下的匠》.jpg'); background-size: cover; background-position: center;">
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/宣传片/蓝城设计院《深蓝下的匠》.mp4" style="background-image: url('img/thumbs/蓝城设计院《深蓝下的匠》.jpg'); background-size: cover; background-position: center;">
                             <span class="play-icon"></span><span class="video-title">蓝城设计院《深蓝下的匠》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/宣传片/黄河公益基金会《未完成的诗篇》.mp4" style="background-image: url('img/thumbs/黄河公益基金会《未完成的诗篇》.jpg'); background-size: cover; background-position: center;">
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/宣传片/杭州直播经济.mp4" style="background-image: url('img/thumbs/杭州直播经济.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">杭州直播经济</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/宣传片/爱德基金会《星辰》字幕说明版.mp4" style="background-image: url('img/thumbs/爱德基金会《星辰》字幕说明版.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">爱德基金会《星辰》字幕说明版</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/宣传片/浙江军工集团《利剑而行》.mp4" style="background-image: url('img/thumbs/浙江军工集团《利剑而行》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙江军工集团《利剑而行》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/宣传片/十八棵御茶园《一茶现万千》.mp4" style="background-image: url('img/thumbs/十八棵御茶园《一茶现万千》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">十八棵御茶园《一茶现万千》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/宣传片/黄河公益基金会《未完成的诗篇》.mp4" style="background-image: url('img/thumbs/黄河公益基金会《未完成的诗篇》.jpg'); background-size: cover; background-position: center;">
                             <span class="play-icon"></span><span class="video-title">黄河公益基金会《未完成的诗篇》</span>
                         </div>
-                    </div></div>
-
-                <!-- Shortfilm Panel -->
-                <div class="works-panel" id="panel-shortfilm">
+                    </div>
                     <div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/LAO center 《万象人生》.mp4" style="background-image: url('img/thumbs/LAO center 《万象人生》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">LAO center《万象人生》</span>
+                        <div class="work-item-thumb" data-src="Video/宣传片/万利《极致即底气》.mp4" style="background-image: url('img/thumbs/万利《极致即底气》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">万利《极致即底气》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/Neverfar.mp4" style="background-image: url('img/thumbs/Neverfar.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">Neverfar</span>
+                    </div>
+                </div>
+
+                <!-- 纪录片 Panel -->
+                <div class="works-panel" id="panel-documentary">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/追觅《让小小的我们被看见》.mp4" style="background-image: url('img/thumbs/追觅《让小小的我们被看见》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">追觅《让小小的我们被看见》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/中免集团《遇见美好》.mp4" style="background-image: url('img/thumbs/中免集团《遇见美好》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">中免集团《遇见美好》</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/小胖威利《星星落在我家里》.mp4" style="background-image: url('img/thumbs/小胖威利《星星落在我家里》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">小胖威利《星星落在我家里》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/九阳公益厨房《少年生长》.mp4" style="background-image: url('img/thumbs/九阳公益厨房《少年生长》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">九阳公益厨房《少年生长》</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/蔻德《妈妈我想陪你一起变老》.mp4" style="background-image: url('img/thumbs/蔻德《妈妈我想陪你一起变老》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">蔻德《妈妈我想陪你一起变老》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/小胖威利《天使就在我家里》.mp4" style="background-image: url('img/thumbs/小胖威利《天使就在我家里》.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">小胖威利《天使就在我家里》</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/上海散爆十周年纪录片.mp4" style="background-image: url('img/thumbs/上海散爆十周年纪录片.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">上海散爆十周年纪录片</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/尾巴生活_混合猫砂.mp4" style="background-image: url('img/thumbs/尾巴生活_混合猫砂.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">尾巴生活 · 混合猫砂</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/春苗基金会《守护早产微宝贝》.mp4" style="background-image: url('img/thumbs/春苗基金会《守护早产微宝贝》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">春苗基金会《守护早产微宝贝》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/湃墅 品牌宣传片.mp4" style="background-image: url('img/thumbs/湃墅 品牌宣传片.jpg'); background-size: cover; background-position: center;">
-                            <span class="play-icon"></span><span class="video-title">湃墅 品牌宣传片</span>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/诺特兰德《山脚下的妈妈》.mp4" style="background-image: url('img/thumbs/诺特兰德《山脚下的妈妈》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">诺特兰德《山脚下的妈妈》</span>
                         </div>
-                    </div><div class="work-item work-item-video">
-                        <div class="work-item-thumb" data-src="video/短片/网易《决战紫禁之巅》.mp4" style="background-image: url('img/thumbs/网易《决战紫禁之巅》.jpg'); background-size: cover; background-position: center;">
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/携程_生育补贴政策.mp4" style="background-image: url('img/thumbs/携程_生育补贴政策.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">携程_生育补贴政策</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/武林青年说.mp4" style="background-image: url('img/thumbs/武林青年说.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">武林青年说</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/威尼斯双年展《美美与共》.mp4" style="background-image: url('img/thumbs/威尼斯双年展《美美与共》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">威尼斯双年展《美美与共》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/纪录片/网易《决战紫禁之巅》.mp4" style="background-image: url('img/thumbs/网易《决战紫禁之巅》.jpg'); background-size: cover; background-position: center;">
                             <span class="play-icon"></span><span class="video-title">网易《决战紫禁之巅》</span>
                         </div>
-                    </div></div>
+                    </div>
+                </div>
+
+                <!-- 剧情片 Panel -->
+                <div class="works-panel" id="panel-drama">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/剧情片/台州税务《起航 》.mp4" style="background-image: url('img/thumbs/台州税务《起航 》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">台州税务《起航 》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/剧情片/真爱梦想 《白马》 .mp4" style="background-image: url('img/thumbs/真爱梦想 《白马》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">真爱梦想 《白马》 </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 短片 Panel -->
+                <div class="works-panel" id="panel-shortfilm">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/短片/湃墅 品牌宣传片.mp4" style="background-image: url('img/thumbs/湃墅 品牌宣传片.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">湃墅 品牌宣传片</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/短片/LAO center 《万象人生》.mp4" style="background-image: url('img/thumbs/LAO center 《万象人生》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">LAO center《万象人生》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/短片/中免集团《遇见美好》.mp4" style="background-image: url('img/thumbs/中免集团《遇见美好》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">中免集团《遇见美好》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/短片/九阳公益厨房《少年生长》.mp4" style="background-image: url('img/thumbs/九阳公益厨房《少年生长》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">九阳公益厨房《少年生长》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/短片/小胖威利《天使就在我家里》.mp4" style="background-image: url('img/thumbs/小胖威利《天使就在我家里》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">小胖威利《天使就在我家里》</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MV Panel -->
+                <div class="works-panel" id="panel-mv">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/MV/皇家美素佳儿&嗨的HiDii国乐团MV.mp4" style="background-image: url('img/thumbs/皇家美素佳儿&嗨的HiDii国乐团MV.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">皇家美素佳儿&嗨的HiDii国乐团MV</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/MV/浙江省肿瘤医院贺岁片.mp4" style="background-image: url('img/thumbs/浙江省肿瘤医院贺岁片.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙江省肿瘤医院贺岁片</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/MV/浙江广电《小餐桌也有大文明》.mp4" style="background-image: url('img/thumbs/浙江广电《小餐桌也有大文明》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙江广电《小餐桌也有大文明》</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/MV/富春江委员会《父亲的故事》.mp4" style="background-image: url('img/thumbs/富春江委员会《父亲的故事》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">富春江委员会《父亲的故事》</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 产品 Panel -->
+                <div class="works-panel" id="panel-product">
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/产品/Neverfar.mp4" style="background-image: url('img/thumbs/Neverfar.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">Neverfar</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/产品/六月鲜_酱油.mp4" style="background-image: url('img/thumbs/六月鲜_酱油.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">六月鲜_酱油</span>
+                        </div>
+                    </div>
+                    <div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="Video/产品/尾巴生活_混合猫砂.mp4" style="background-image: url('img/thumbs/尾巴生活_混合猫砂.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">尾巴生活_混合猫砂</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
 
     <!-- CONTACT -->
     <section class="section" id="contact">
@@ -850,7 +999,12 @@
     <!-- VIDEO MODAL -->
     <div class="video-modal" id="videoModal">
         <button class="modal-close" id="modalClose">&times;</button>
-        <video id="modalVideo" controls></video>
+        <div class="video-wrapper">
+            <video id="modalVideo" controls></video>
+            <div class="video-play-overlay" id="videoPlayOverlay">
+                <div class="custom-play-btn" id="customPlayBtn"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -879,6 +1033,21 @@
         const videoModal = document.getElementById('videoModal');
         const modalVideo = document.getElementById('modalVideo');
         const modalClose = document.getElementById('modalClose');
+        const videoPlayOverlay = document.getElementById('videoPlayOverlay');
+        const customPlayBtn = document.getElementById('customPlayBtn');
+
+        // 视频暂停时显示自定义播放按钮
+        modalVideo.addEventListener('pause', () => {
+            videoPlayOverlay.classList.add('visible');
+        });
+        modalVideo.addEventListener('play', () => {
+            videoPlayOverlay.classList.remove('visible');
+        });
+        // 点击自定义播放按钮恢复播放
+        customPlayBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            modalVideo.play();
+        });
 
         document.querySelectorAll('.work-item-video .work-item-thumb').forEach(thumb => {
             thumb.style.cursor = 'pointer';

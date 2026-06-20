@@ -95,10 +95,21 @@
             filter: grayscale(30%) brightness(0.55);
         }
 
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
         .hero-overlay {
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg, rgba(20,20,22,0.2) 0%, rgba(20,20,22,0.75) 60%, var(--bg) 100%);
+            z-index: 1;
         }
 
         .hero-content {
@@ -109,21 +120,13 @@
             padding: 0 24px;
         }
 
-        .hero-content h1 {
-            font-size: clamp(44px, 7vw, 76px);
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            color: #fff;
-            margin-bottom: 24px;
-            line-height: 1.08;
-        }
-
-        .hero-content .tagline {
-            font-size: 17px;
-            color: rgba(255,255,255,0.6);
-            font-weight: 400;
-            letter-spacing: 0.04em;
-            line-height: 1.85;
+        .hero-content .hero-logo {
+            display: block;
+            max-width: 240px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            opacity: 0.5;
         }
 
         .hero-scroll {
@@ -189,6 +192,13 @@
         }
 
         /* ===== ABOUT ===== */
+        .about-name {
+            font-size: 2.4rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 6px;
+        }
+
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -709,7 +719,7 @@
 
     <!-- NAV -->
     <nav class="nav" id="nav">
-        <div class="nav-logo">DEYI</div>
+
         <ul class="nav-items">
             <li><a href="#about">关于</a></li>
             <li><a href="#skills">技能</a></li>
@@ -720,13 +730,15 @@
 
     <!-- HERO -->
     <section class="hero">
+        <video class="hero-video" autoplay loop muted playsinline>
+            <source src="Video/封面动态.mp4" type="video/mp4">
+        </video>
         <div class="hero-bg">
             <img src="img/photo.jpg" alt="">
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content reveal">
-            <h1>德意</h1>
-            <p class="tagline">资深剪辑师，深耕行业 11 年。<br>专注广告、TVC、纪录片、宣传片等各类视频剪辑，兼具包装、合成、动画与调色能力。</p>
+            <img class="hero-logo" src="img/dongye-logo-white.png" alt="DONGYE">
         </div>
         <div class="hero-scroll">
             <span>SCROLL</span>
@@ -739,7 +751,7 @@
         <div class="section-inner">
             <div class="about-grid">
                 <div class="about-text reveal">
-                    <p class="intro">后期总监 / 剪辑指导 / 剪辑师。11 年来深度参与广告、TVC、纪录片、宣传片等多种类型的影片制作，在剪辑之外也涉足包装、合成、动画与调色，追求每一帧的精准表达。</p>
+                    <p class="intro"><span class="about-name">德意</span>后期总监 / 剪辑指导 / 资深剪辑师。深耕行业 11 年，深度参与广告、TVC、纪录片、宣传片等多种类型的影片制作，在剪辑之外也涉足包装、合成、动画与调色，追求每一帧的精准表达。</p>
                     <div class="about-stats">
                         <div class="about-stat">
                             <div class="val">11+</div>

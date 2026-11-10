@@ -1,0 +1,7 @@
+Video/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+img/thumbs/*.jpg filter=lfs diff=lfs merge=lfs -text
+img/thumbs/*.jpg !text !filter !merge !diff
+img/thumbs/*.png !text !filter !merge !diff
+Video/封面动态高码流.mp4 !text !filter !merge !diff
+Video/**/*.mp4 !text !filter !merge !diff
+Video/MV/富春江委员会《父亲的故事》.mp4 filter=lfs diff=lfs merge=lfs -text

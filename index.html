@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德意 — Film Editor</title>
+    <style>
+        :root {
+            --bg: #141416;
+            --bg-elevated: #1c1c1e;
+            --bg-card: #242426;
+            --bg-card-hover: #2a2a2d;
+            --text: #e8e8e8;
+            --text-dim: #a0a0a0;
+            --text-muted: #666;
+            --border: #2c2c2e;
+            --border-light: #38383a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 400;
+            overflow-x: hidden;
+        }
+
+        /* ===== NAV ===== */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            transition: background 0.3s, border-color 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .nav.scrolled {
+            background: rgba(20, 20, 22, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom-color: rgba(255,255,255,0.06);
+        }
+
+        .nav-logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--text);
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-items a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            transition: color 0.2s;
+        }
+
+        .nav-items a:hover { color: var(--text); }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            filter: grayscale(30%) brightness(0.55);
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(20,20,22,0.2) 0%, rgba(20,20,22,0.75) 60%, var(--bg) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 680px;
+            padding: 0 24px;
+        }
+
+        .hero-content .hero-logo {
+            display: block;
+            max-width: 240px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            opacity: 0.5;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.4;
+        }
+
+        .hero-scroll span {
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .hero-scroll .line {
+            width: 1px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            animation: scroll-line 2s ease-in-out infinite;
+        }
+
+        @keyframes scroll-line {
+            0%, 100% { transform: scaleY(1); transform-origin: top; }
+            50% { transform: scaleY(0.4); transform-origin: top; }
+        }
+
+        /* ===== SECTION ===== */
+        .section {
+            padding: 120px 0;
+        }
+
+        .section-alt {
+            background: var(--bg-elevated);
+        }
+
+        .section-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .sec-header {
+            text-align: center;
+            margin-bottom: 72px;
+        }
+
+        .sec-header .num {
+            display: none;
+        }
+
+        .sec-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            color: var(--text);
+        }
+
+        /* ===== ABOUT ===== */
+        .about-name {
+            font-size: 2.4rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .about-text .intro {
+            font-size: 18px;
+            line-height: 1.9;
+            color: var(--text-dim);
+            margin-bottom: 48px;
+        }
+
+        .about-stats {
+            display: flex;
+            gap: 64px;
+        }
+
+        .about-stat .val {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .about-stat .lbl {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+        }
+
+        .about-image {
+            display: flex;
+            justify-content: center;
+        }
+
+        .about-image img {
+            max-width: 380px;
+            width: 100%;
+            border-radius: 6px;
+            filter: grayscale(15%);
+        }
+
+        /* ===== SKILLS ===== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 40px 32px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .skill-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+        }
+
+        .skill-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            margin-bottom: 22px;
+            color: var(--text);
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tags span {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            letter-spacing: 0.03em;
+            transition: all 0.2s;
+        }
+
+        .skill-tags span:hover {
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text);
+        }
+
+        .skill-tags .primary {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.12);
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ===== WORKS ===== */
+        .works-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 52px;
+        }
+
+        .works-tab {
+            padding: 10px 28px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
+
+        .works-tab:hover {
+            color: var(--text);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .works-tab.active {
+            color: var(--text);
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .works-panel { display: none; }
+        .works-panel.active { display: contents; }
+
+        .work-item {
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .work-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-light);
+        }
+
+        .work-item-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: var(--bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .work-item-info {
+            padding: 18px 20px;
+        }
+
+        .work-item-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .work-item-info .meta {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .works-placeholder {
+            grid-column: 1 / -1;
+            padding: 80px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===== VIDEO CARD ===== */
+        .work-item-video .work-item-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            overflow: hidden;
+        }
+
+        .work-item-video .work-item-thumb::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .work-item-video .work-item-thumb::after {
+            /* 保留空规则，仅用于可能的未来扩展 */
+        }
+
+        .work-item-video .work-item-thumb .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            z-index: 3;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .work-item-video .work-item-thumb .play-icon::before {
+            content: '\25B6';
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+            margin-left: 2px;
+            transition: color 0.3s;
+        }
+
+        .work-item-video:hover .work-item-thumb .play-icon {
+            background: rgba(0,0,0,0.65);
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        .work-item-video:hover .work-item-thumb .play-icon::before {
+            color: rgba(255,255,255,1);
+        }
+
+        .work-item-video .work-item-thumb .video-title {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            z-index: 3;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        .work-item-video .work-item-info {
+            display: none;
+        }
+
+        /* ===== VIDEO MODAL ===== */
+        .video-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .video-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .video-modal .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            cursor: pointer;
+            color: #fff;
+            font-size: 22px;
+            line-height: 44px;
+            text-align: center;
+            transition: background 0.2s;
+            z-index: 1;
+        }
+        .video-modal .modal-close:hover {
+            background: rgba(255,255,255,0.18);
+        }
+        .video-modal video {
+            max-width: 70vw;
+            max-height: 70vh;
+            border-radius: 6px;
+            outline: none;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .video-modal iframe {
+            width: 70vw;
+            aspect-ratio: 16 / 9;
+            max-width: 70vw;
+            max-height: 70vh;
+            border-radius: 6px;
+            border: none;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* 隐藏浏览器原生覆盖播放按钮 */
+        .video-modal video::-webkit-media-controls-overlay-play-button {
+            display: none;
+        }
+
+        /* 自定义播放按钮覆盖层 */
+        .video-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .video-play-overlay.visible {
+            opacity: 1;
+        }
+        .video-play-overlay .custom-play-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: background 0.2s;
+        }
+        .video-play-overlay .custom-play-btn:hover {
+            background: rgba(0, 0, 0, 0.65);
+        }
+        .video-play-overlay .custom-play-btn::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px 0 6px 11px;
+            border-color: transparent transparent transparent rgba(255, 255, 255, 0.85);
+            margin-left: 2px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== CONTACT ===== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 32px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .contact-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+        }
+
+        .contact-card .label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .contact-card .value {
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .contact-card a {
+            color: var(--text);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .contact-card a:hover { opacity: 0.65; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 36px 40px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== REVEAL ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .nav-items { gap: 20px; }
+            .about-grid { grid-template-columns: 1fr; gap: 48px; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .works-grid { grid-template-columns: 1fr 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .section-inner { padding: 0 20px; }
+            .section { padding: 80px 0; }
+            .about-stats { gap: 44px; }
+            .sec-header { margin-bottom: 48px; }
+            .sec-header h2 { font-size: 24px; }
+            .hero-content .tagline { font-size: 16px; }
+            .hero-scroll { bottom: 32px; }
+            .video-modal video {
+                max-width: 92vw;
+                max-height: 80vh;
+            }
+            .video-modal iframe {
+                width: 92vw;
+                max-width: 92vw;
+                max-height: 80vh;
+            }
+            .video-modal .modal-close { top: 16px; right: 16px; }
+            .contact-card { padding: 24px; }
+            .work-item-video .work-item-thumb .video-title { font-size: 12px; }
+            .footer { padding: 28px 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 { font-size: 32px; }
+            .hero-content .tagline { font-size: 14px; line-height: 1.7; }
+            .nav { padding: 12px 16px; }
+            .nav-logo { font-size: 14px; }
+            .nav-items { gap: 12px; }
+            .nav-items a { font-size: 11px; }
+            .works-grid { grid-template-columns: 1fr; }
+            .works-tab { padding: 8px 16px; font-size: 12px; }
+            .works-tabs { gap: 4px; margin-bottom: 36px; }
+            .about-stats { gap: 24px; }
+            .about-stat .val { font-size: 28px; }
+            .about-stat .lbl { font-size: 11px; }
+            .about-text .intro { font-size: 15px; line-height: 1.8; }
+            .section { padding: 64px 0; }
+            .sec-header { margin-bottom: 40px; }
+            .sec-header h2 { font-size: 22px; }
+            .video-modal video {
+                max-width: 96vw;
+                max-height: 85vh;
+                border-radius: 4px;
+            }
+            .video-modal iframe {
+                width: 96vw;
+                max-width: 96vw;
+                max-height: 85vh;
+                border-radius: 4px;
+            }
+            .video-modal .modal-close {
+                top: 12px; right: 12px;
+                width: 36px; height: 36px;
+                font-size: 18px; line-height: 36px;
+            }
+            .contact-card { padding: 24px 20px; }
+            .contact-card .value { font-size: 15px; }
+            .work-item-video .work-item-thumb .video-title { font-size: 13px; top: 12px; left: 12px; right: 12px; }
+            .work-item-video .work-item-thumb .play-icon { width: 36px; height: 36px; }
+            .work-item-video .work-item-thumb .play-icon::before { font-size: 12px; }
+            .footer { padding: 24px 16px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav" id="nav">
+
+        <ul class="nav-items">
+            <li><a href="#about">关于</a></li>
+            <li><a href="#skills">技能</a></li>
+            <li><a href="#works">作品</a></li>
+            <li><a href="#contact">联系</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <video class="hero-video" autoplay loop muted playsinline>
+            <source src="Video/封面动态高码流.mp4?v=2" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content reveal">
+            <img class="hero-logo" src="img/dongye-logo-white.png" alt="DONGYE">
+        </div>
+        <div class="hero-scroll">
+            <span>SCROLL</span>
+            <div class="line"></div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section section-alt" id="about">
+        <div class="section-inner">
+            <div class="about-grid">
+                <div class="about-text reveal">
+                    <p class="intro"><span class="about-name">德意</span>后期总监 / 剪辑指导 / 资深剪辑师。深耕行业 11 年，深度参与广告、TVC、纪录片、宣传片等多种类型的影片制作，在剪辑之外也涉足包装、合成、动画与调色，追求每一帧的精准表达。</p>
+                    <div class="about-stats">
+                        <div class="about-stat">
+                            <div class="val">11+</div>
+                            <div class="lbl">年经验</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="val">200+</div>
+                            <div class="lbl">完成项目</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image reveal">
+                    <img src="img/photo.jpg" alt="德意">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section" id="skills">
+        <div class="section-inner">
+            <div class="sec-header reveal">
+                <span class="num">01</span>
+                <h2>技能与工具</h2>
+            </div>
+            <div class="skills-grid reveal">
+                <div class="skill-card">
+                    <h3>核心软件</h3>
+                    <div class="skill-tags">
+                        <span class="primary">DaVinci Resolve</span>
+                        <span class="primary">Premiere Pro</span>
+                        <span class="primary">After Effects</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <h3>专业领域</h3>
+                    <div class="skill-tags">
+                        <span>广告</span>
+                        <span>TVC</span>
+                        <span>纪录片</span>
+                        <span>宣传片</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <h3>拓展能力</h3>
+                    <div class="skill-tags">
+                        <span>包装</span>
+                        <span>合成</span>
+                        <span>动画</span>
+                        <span>调色</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WORKS -->
+    <section class="section section-alt" id="works">
+        <div class="section-inner">
+            <div class="sec-header reveal">
+                <span class="num">02</span>
+                <h2>代表作品</h2>
+            </div>
+            <div class="works-tabs reveal">
+                <button class="works-tab active" data-tab="tvc">TVC</button>
+                <button class="works-tab" data-tab="promo">宣传片</button>
+                <button class="works-tab" data-tab="documentary">纪录片</button>
+                <button class="works-tab" data-tab="shortfilm">短片</button>
+                <button class="works-tab" data-tab="drama">剧情片</button>
+                <button class="works-tab" data-tab="mv">MV</button>
+                <button class="works-tab" data-tab="product">产品</button>
+            </div>
+            <div class="works-grid reveal">
+                <!-- TVC Panel -->
+                <div class="works-panel active" id="panel-tvc">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E5%9B%BD%E5%AE%B6%E7%94%B5%E7%BD%91%E3%80%8A%E7%85%BD%E9%A3%8E%E7%82%B9%E7%81%AB%E3%80%8B.mp4" style="background-image: url('img/thumbs/国家电网《煽风点火》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">国家电网《煽风点火》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E9%99%88%E4%B8%80%E4%B8%B9%E5%9F%BA%E9%87%91%E4%BC%9A%E3%80%8A%E6%97%AE%E6%97%AFGALA%E3%80%8B.mp4" style="background-image: url('img/thumbs/陈一丹基金会《旮旯GALA》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">陈一丹基金会《旮旯GALA》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E5%B1%85%E5%AE%B6%E5%AE%B6%E5%B1%85%E3%80%8A%E6%B6%88%E5%A4%B1%E7%9A%84%E4%B8%80%E5%B0%8F%E6%97%B6%E3%80%8B.mp4" style="background-image: url('img/thumbs/居家家居《消失的一小时》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">居家家居《消失的一小时》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E5%B0%8F%E8%83%96%E5%A8%81%E5%8A%9B%E3%80%8A%E6%98%9F%E7%A9%BA%E6%BC%AB%E6%B8%B8%E8%80%85%E3%80%8B.mp4" style="background-image: url('img/thumbs/小胖威力《星空漫游者》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">小胖威力《星空漫游者》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E6%9D%A5%E4%BC%8A%E4%BB%BD%E3%80%8A%E5%97%A8%E5%90%83%E6%97%A0%E9%AA%A8%E3%80%8B.mp4" style="background-image: url('img/thumbs/来伊份《嗨吃无骨》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">来伊份《嗨吃无骨》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E5%85%B4%E8%80%80%E6%88%BF%E4%BA%A7%E3%80%8A%E4%B8%80%E6%A3%B5%E6%A0%91%E7%9A%84%E7%AD%94%E6%A1%88%E3%80%8B.mp4" style="background-image: url('img/thumbs/兴耀房产《一棵树的答案》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">兴耀房产《一棵树的答案》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/TVC/%E5%93%A5%E5%B8%9D%E5%A8%81%E3%80%8Aman%26chans%E3%80%8B.mp4" style="background-image: url('img/thumbs/哥帝威《man&chans》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">哥帝威《man&chans》</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 宣传片 Panel -->
+                <div class="works-panel" id="panel-promo">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E5%B1%B1%E8%A5%BF%E9%9D%92%E5%9F%BA%E4%BC%9A%E3%80%8A%E4%B8%89%E6%99%8B%E6%96%87%E6%98%8E%E5%AE%88%E6%9C%9B%E3%80%8B.mp4" style="background-image: url('img/thumbs/山西青基会《三晋文明守望》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">山西青基会《三晋文明守望》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E6%9D%AD%E5%B7%9E%E7%9B%B4%E6%92%AD%E7%BB%8F%E6%B5%8E.mp4" style="background-image: url('img/thumbs/杭州直播经济.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">杭州直播经济</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E8%93%9D%E5%9F%8E%E8%AE%BE%E8%AE%A1%E9%99%A2%E3%80%8A%E6%B7%B1%E8%93%9D%E4%B8%8B%E7%9A%84%E5%8C%A0%E3%80%8B.mp4" style="background-image: url('img/thumbs/蓝城设计院《深蓝下的匠》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">蓝城设计院《深蓝下的匠》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E5%8D%81%E5%85%AB%E6%A3%B5%E5%BE%A1%E8%8C%B6%E5%9B%AD%E3%80%8A%E4%B8%80%E8%8C%B6%E7%8E%B0%E4%B8%87%E5%8D%83%E3%80%8B.mp4" style="background-image: url('img/thumbs/十八棵御茶园《一茶现万千》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">十八棵御茶园《一茶现万千》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E6%B5%99%E6%B1%9F%E5%86%9B%E5%B7%A5%E9%9B%86%E5%9B%A2%E3%80%8A%E5%88%A9%E5%89%91%E8%80%8C%E8%A1%8C%E3%80%8B.mp4" style="background-image: url('img/thumbs/浙江军工集团《利剑而行》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙江军工集团《利剑而行》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E4%B8%87%E5%88%A9%E3%80%8A%E6%9E%81%E8%87%B4%E5%8D%B3%E5%BA%95%E6%B0%94%E3%80%8B.mp4" style="background-image: url('img/thumbs/万利《极致即底气》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">万利《极致即底气》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E9%BB%84%E6%B2%B3%E5%85%AC%E7%9B%8A%E5%9F%BA%E9%87%91%E4%BC%9A%E3%80%8A%E6%9C%AA%E5%AE%8C%E6%88%90%E7%9A%84%E8%AF%97%E7%AF%87%E3%80%8B.mp4" style="background-image: url('img/thumbs/黄河公益基金会《未完成的诗篇》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">黄河公益基金会《未完成的诗篇》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E7%88%B1%E5%BE%B7%E5%9F%BA%E9%87%91%E4%BC%9A%E3%80%8A%E6%98%9F%E8%BE%B0%E3%80%8B%E5%AD%97%E5%B9%95%E8%AF%B4%E6%98%8E%E7%89%88.mp4" style="background-image: url('img/thumbs/爱德基金会《星辰》字幕说明版.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">爱德基金会《星辰》字幕说明版</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/宣传片/%E6%B5%99%E5%95%86%E9%93%B6%E8%A1%8C%E3%80%8A%E6%B5%99%E9%93%B6%E6%99%AE%E6%83%A03000%E4%BA%BF%E3%80%8B.mp4" style="background-image: url('img/thumbs/浙商银行《浙银普惠3000亿》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙商银行《浙银普惠3000亿》</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 纪录片 Panel -->
+                <div class="works-panel" id="panel-documentary">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E4%B8%8A%E6%B5%B7%E6%95%A3%E7%88%86%E5%8D%81%E5%91%A8%E5%B9%B4%E7%BA%AA%E5%BD%95%E7%89%87.mp4" style="background-image: url('img/thumbs/上海散爆十周年纪录片.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">上海散爆十周年纪录片</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E7%BD%91%E6%98%93%E3%80%8A%E5%86%B3%E6%88%98%E7%B4%AB%E7%A6%81%E4%B9%8B%E5%B7%85%E3%80%8B.mp4" style="background-image: url('img/thumbs/网易《决战紫禁之巅》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">网易《决战紫禁之巅》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E8%BF%BD%E8%A7%85%E3%80%8A%E8%AE%A9%E5%B0%8F%E5%B0%8F%E7%9A%84%E6%88%91%E4%BB%AC%E8%A2%AB%E7%9C%8B%E8%A7%81%E3%80%8B.mp4" style="background-image: url('img/thumbs/追觅《让小小的我们被看见》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">追觅《让小小的我们被看见》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E5%B0%8F%E8%83%96%E5%A8%81%E5%88%A9%E3%80%8A%E6%98%9F%E6%98%9F%E8%90%BD%E5%9C%A8%E6%88%91%E5%AE%B6%E9%87%8C%E3%80%8B.mp4" style="background-image: url('img/thumbs/小胖威利《星星落在我家里》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">小胖威利《星星落在我家里》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E6%98%A5%E8%8B%97%E5%9F%BA%E9%87%91%E4%BC%9A%E3%80%8A%E5%AE%88%E6%8A%A4%E6%97%A9%E4%BA%A7%E5%BE%AE%E5%AE%9D%E8%B4%9D%E3%80%8B.mp4" style="background-image: url('img/thumbs/春苗基金会《守护早产微宝贝》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">春苗基金会《守护早产微宝贝》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E8%94%BB%E5%BE%B7%E3%80%8A%E5%A6%88%E5%A6%88%E6%88%91%E6%83%B3%E9%99%AA%E4%BD%A0%E4%B8%80%E8%B5%B7%E5%8F%98%E8%80%81%E3%80%8B.mp4" style="background-image: url('img/thumbs/蔻德《妈妈我想陪你一起变老》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">蔻德《妈妈我想陪你一起变老》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E8%AF%BA%E7%89%B9%E5%85%B0%E5%BE%B7%E3%80%8A%E5%B1%B1%E8%84%9A%E4%B8%8B%E7%9A%84%E5%A6%88%E5%A6%88%E3%80%8B.mp4" style="background-image: url('img/thumbs/诺特兰德《山脚下的妈妈》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">诺特兰德《山脚下的妈妈》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E5%A8%81%E5%B0%BC%E6%96%AF%E5%8F%8C%E5%B9%B4%E5%B1%95%E3%80%8A%E7%BE%8E%E7%BE%8E%E4%B8%8E%E5%85%B1%E3%80%8B.mp4" style="background-image: url('img/thumbs/威尼斯双年展《美美与共》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">威尼斯双年展《美美与共》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E6%90%BA%E7%A8%8B_%E7%94%9F%E8%82%B2%E8%A1%A5%E8%B4%B4%E6%94%BF%E7%AD%96.mp4" style="background-image: url('img/thumbs/携程_生育补贴政策.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">携程_生育补贴政策</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/纪录片/%E6%AD%A6%E6%9E%97%E9%9D%92%E5%B9%B4%E8%AF%B4.mp4" style="background-image: url('img/thumbs/武林青年说.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">武林青年说</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 短片 Panel -->
+                <div class="works-panel" id="panel-shortfilm">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/短片/%E4%B8%AD%E5%85%8D%E9%9B%86%E5%9B%A2%E3%80%8A%E9%81%87%E8%A7%81%E7%BE%8E%E5%A5%BD%E3%80%8B.mp4" style="background-image: url('img/thumbs/中免集团《遇见美好》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">中免集团《遇见美好》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/短片/%E5%AE%A2%E5%AE%B6%E9%97%B9%E9%BE%99%E7%81%AF%E3%80%8A%E5%85%83%E5%A4%95%E9%BE%99%E8%88%9E%E3%80%8B.mp4" style="background-image: url('img/thumbs/客家闹龙灯《元夕龙舞》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">客家闹龙灯《元夕龙舞》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/短片/%E4%B9%9D%E9%98%B3%E5%85%AC%E7%9B%8A%E5%8E%A8%E6%88%BF%E3%80%8A%E5%B0%91%E5%B9%B4%E7%94%9F%E9%95%BF%E3%80%8B.mp4" style="background-image: url('img/thumbs/九阳公益厨房《少年生长》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">九阳公益厨房《少年生长》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/短片/%E6%B9%83%E5%A2%85%20%E5%93%81%E7%89%8C%E5%AE%A3%E4%BC%A0%E7%89%87.mp4" style="background-image: url('img/thumbs/%E6%B9%83%E5%A2%85%20%E5%93%81%E7%89%8C%E5%AE%A3%E4%BC%A0%E7%89%87.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">湃墅 品牌宣传片</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/%E7%9F%AD%E7%89%87/LAO%20center%20%E3%80%8A%E4%B8%87%E8%B1%A1%E4%BA%BA%E7%94%9F%E3%80%8B.mp4" style="background-image: url('img/thumbs/LAO%20center%20%E3%80%8A%E4%B8%87%E8%B1%A1%E4%BA%BA%E7%94%9F%E3%80%8B.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">LAO center《万象人生》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/短片/%E5%B0%8F%E8%83%96%E5%A8%81%E5%88%A9%E3%80%8A%E5%A4%A9%E4%BD%BF%E5%B0%B1%E5%9C%A8%E6%88%91%E5%AE%B6%E9%87%8C%E3%80%8B.mp4" style="background-image: url('img/thumbs/小胖威利《天使就在我家里》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">小胖威利《天使就在我家里》</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 剧情片 Panel -->
+                <div class="works-panel" id="panel-drama">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/剧情片/%E7%9C%9F%E7%88%B1%E6%A2%A6%E6%83%B3%20%E3%80%8A%E7%99%BD%E9%A9%AC%E3%80%8B%20.mp4" style="background-image: url('img/thumbs/%E7%9C%9F%E7%88%B1%E6%A2%A6%E6%83%B3%20%E3%80%8A%E7%99%BD%E9%A9%AC%E3%80%8B.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">真爱梦想 《白马》 </span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/剧情片/%E5%8F%B0%E5%B7%9E%E7%A8%8E%E5%8A%A1%E3%80%8A%E8%B5%B7%E8%88%AA%20%E3%80%8B.mp4" style="background-image: url('img/thumbs/%E5%8F%B0%E5%B7%9E%E7%A8%8E%E5%8A%A1%E3%80%8A%E8%B5%B7%E8%88%AA%20%E3%80%8B.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">台州税务《起航 》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/剧情片/%E8%9E%8D%E5%AF%93%E3%80%8A%E8%9E%8D%E7%88%B1%E4%BA%8E%E5%85%89%E3%80%8B.mp4" style="background-image: url('img/thumbs/融寓《融爱于光》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">融寓《融爱于光》</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MV Panel -->
+                <div class="works-panel" id="panel-mv">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/MV/%E6%B5%99%E6%B1%9F%E5%B9%BF%E7%94%B5%E3%80%8A%E5%B0%8F%E9%A4%90%E6%A1%8C%E4%B9%9F%E6%9C%89%E5%A4%A7%E6%96%87%E6%98%8E%E3%80%8B.mp4" style="background-image: url('img/thumbs/浙江广电《小餐桌也有大文明》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙江广电《小餐桌也有大文明》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/MV/%E5%AF%8C%E6%98%A5%E6%B1%9F%E5%A7%94%E5%91%98%E4%BC%9A%E3%80%8A%E7%88%B6%E4%BA%B2%E7%9A%84%E6%95%85%E4%BA%8B%E3%80%8B.mp4" style="background-image: url('img/thumbs/富春江委员会《父亲的故事》.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">富春江委员会《父亲的故事》</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/MV/%E6%B5%99%E6%B1%9F%E7%9C%81%E8%82%BF%E7%98%A4%E5%8C%BB%E9%99%A2%E8%B4%BA%E5%B2%81%E7%89%87.mp4" style="background-image: url('img/thumbs/浙江省肿瘤医院贺岁片.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">浙江省肿瘤医院贺岁片</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/MV/%E7%9A%87%E5%AE%B6%E7%BE%8E%E7%B4%A0%E4%BD%B3%E5%84%BF%26%E5%97%A8%E7%9A%84HiDii%E5%9B%BD%E4%B9%90%E5%9B%A2MV.mp4" style="background-image: url('img/thumbs/皇家美素佳儿&嗨的HiDii国乐团MV.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">皇家美素佳儿&嗨的HiDii国乐团MV</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 产品 Panel -->
+                <div class="works-panel" id="panel-product">
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/产品/Neverfar.mp4" style="background-image: url('img/thumbs/Neverfar.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">Neverfar</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/产品/%E5%85%AD%E6%9C%88%E9%B2%9C_%E9%85%B1%E6%B2%B9.mp4" style="background-image: url('img/thumbs/六月鲜_酱油.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">六月鲜_酱油</span>
+                        </div>
+                    </div>
+<div class="work-item work-item-video">
+                        <div class="work-item-thumb" data-src="https://nas.dongye.xyz/dav/产品/%E5%B0%BE%E5%B7%B4%E7%94%9F%E6%B4%BB_%E6%B7%B7%E5%90%88%E7%8C%AB%E7%A0%82.mp4" style="background-image: url('img/thumbs/尾巴生活_混合猫砂.jpg'); background-size: cover; background-position: center;">
+                            <span class="play-icon"></span><span class="video-title">尾巴生活_混合猫砂</span>
+                        </div>
+                    </div>
+                </div>
+            </div>            </div>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact">
+        <div class="section-inner">
+            <div class="sec-header reveal">
+                <span class="num">03</span>
+                <h2>联系方式</h2>
+            </div>
+            <div class="contact-grid reveal">
+                <div class="contact-card">
+                    <span class="label">手机</span>
+                    <span class="value">15715794021</span>
+                </div>
+                <div class="contact-card">
+                    <span class="label">邮箱</span>
+                    <span class="value"><a href="mailto:mdjsszxgnib@163.com">mdjsszxgnib@163.com</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        &copy; 2026 德意 &nbsp;·&nbsp; Film Editor &amp; Post-Production Director
+    </footer>
+
+    <!-- VIDEO MODAL -->
+    <div class="video-modal" id="videoModal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="video-wrapper">
+            <video id="modalVideo" controls></video>
+            <iframe id="modalBilibili" style="display:none" allowfullscreen></iframe>
+            <div class="video-play-overlay" id="videoPlayOverlay">
+                <div class="custom-play-btn" id="customPlayBtn"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        document.querySelectorAll('.works-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.works-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.works-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 视频卡片点击：弹出遮罩层播放
+        const videoModal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalBilibili = document.getElementById('modalBilibili');
+        const modalClose = document.getElementById('modalClose');
+        const videoPlayOverlay = document.getElementById('videoPlayOverlay');
+        const customPlayBtn = document.getElementById('customPlayBtn');
+
+        // 视频暂停时显示自定义播放按钮
+        modalVideo.addEventListener('pause', () => {
+            videoPlayOverlay.classList.add('visible');
+        });
+        modalVideo.addEventListener('play', () => {
+            videoPlayOverlay.classList.remove('visible');
+        });
+        // 点击自定义播放按钮恢复播放
+        customPlayBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            modalVideo.play();
+        });
+
+        document.querySelectorAll('.work-item-video .work-item-thumb').forEach(thumb => {
+            thumb.style.cursor = 'pointer';
+            thumb.addEventListener('click', () => {
+                const type = thumb.getAttribute('data-type');
+                if (type === 'bilibili') {
+                    const bvid = thumb.getAttribute('data-bvid');
+                    if (modalBilibili) {
+                        modalBilibili.src = 'https://player.bilibili.com/player.html?bvid=' + bvid + '&page=1';
+                        modalBilibili.style.display = '';
+                        modalBilibili.style.border = 'none';
+                    }
+                    modalVideo.style.display = 'none';
+                    videoPlayOverlay.classList.remove('visible');
+                    videoModal.classList.add('active');
+                } else if (type === 'youku') {
+                    const youkuId = thumb.getAttribute('data-youku-id');
+                    if (modalBilibili) {
+                        modalBilibili.src = 'https://player.youku.com/embed/' + youkuId;
+                        modalBilibili.style.display = '';
+                        modalBilibili.style.border = 'none';
+                    }
+                    modalVideo.style.display = 'none';
+                    videoPlayOverlay.classList.remove('visible');
+                    videoModal.classList.add('active');
+                } else {
+                    const src = thumb.getAttribute('data-src');
+                    if (src) {
+                        if (modalBilibili) {
+                            modalBilibili.style.display = 'none';
+                            modalBilibili.src = '';
+                        }
+                        modalVideo.style.display = '';
+                        modalVideo.src = src;
+                        videoModal.classList.add('active');
+                        modalVideo.play();
+                    }
+                }
+            });
+        });
+
+        function closeModal() {
+            modalVideo.pause();
+            modalVideo.src = '';
+            if (modalBilibili) {
+                modalBilibili.src = '';
+                modalBilibili.style.display = 'none';
+            }
+            modalVideo.style.display = '';
+            videoModal.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
